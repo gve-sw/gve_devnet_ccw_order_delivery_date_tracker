@@ -1,0 +1,17 @@
+# CCW API App Details
+CLIENT_KEY = ""
+CLIENT_SECRET = ""
+
+# Configurable Parameters
+KEEP_HISTORY = False
+INSERT_BEFORE_COLUMN = ""
+
+# Excel Details
+EXCEL_FILE_NAME = ""
+EXCEL_SHEET_NAME = ""
+SALES_ORDER_NUMBER_COLUMN_NAME = ""
+OUTPUT_COLUMN_NAME = ""
+
+# For Delivery Date Use Case
+SHIP_SET_COLUMN_NAME = ""
+SKU_COLUMN_NAME = ""
