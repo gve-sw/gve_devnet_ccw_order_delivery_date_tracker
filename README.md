@@ -50,18 +50,19 @@ The names of the columns are specified in the `config.py` file, and other column
 
 ## Installation/Configuration
 1. Clone this repository with `git clone [repository name]`
-2. Add the App Key and App Secret to `config.py` from the prerequisites section
-```python
-CLIENT_KEY = ""
-CLIENT_SECRET = ""
+2. Rename the `.env_sample` file to `.env`. Rename `config_sample.py` to `config.py`.
+3. Add the App Key and App Secret to `.env` from the prerequisites section
+```dotenv
+CLIENT_KEY=""
+CLIENT_SECRET=""
 ```
-3. Enable `KEEP_HISTORY` feature if desired. This feature appends new date-stamped versions of `OUTPUT_COLUMN_NAME` before the `INSERT_BEFORE_COLUMN` value (Ex: Column 'F'). Columns are shifted to the right, the previous `INSERT_BEFORE_COLUMN` value becomes the most recent entry, effectively tracking progression of a column over time from left to right.
+4. Enable `KEEP_HISTORY` feature if desired (`config.py`). This feature appends new date-stamped versions of `OUTPUT_COLUMN_NAME` before the `INSERT_BEFORE_COLUMN` value (Ex: Column 'F'). Columns are shifted to the right, the previous `INSERT_BEFORE_COLUMN` value becomes the most recent entry, effectively tracking progression of a column over time from left to right.
 ```python
 KEEP_HISTORY = False
 INSERT_BEFORE_COLUMN = ''
 ```
 
-4. Add the essential input Excel parameters in `config.py`. Add any other columns as necessary for the use case
+5. Add the essential input Excel parameters in `config.py`. Add any other columns as necessary for the use case
 ```python
 EXCEL_FILE_NAME = ""
 EXCEL_SHEET_NAME = ""
@@ -76,8 +77,8 @@ SHIP_SET_COLUMN_NAME = ""
 SKU_COLUMN_NAME = ""
 ```
 
-5. Set up a Python virtual environment. Make sure Python 3 is installed in your environment, and if not, you may download Python [here](https://www.python.org/downloads/). Once Python 3 is installed in your environment, you can activate the virtual environment with the instructions found [here](https://docs.python.org/3/tutorial/venv.html).
-6. Install the requirements with `pip3 install -r requirements.txt`
+6. Set up a Python virtual environment. Make sure Python 3 is installed in your environment, and if not, you may download Python [here](https://www.python.org/downloads/). Once Python 3 is installed in your environment, you can activate the virtual environment with the instructions found [here](https://docs.python.org/3/tutorial/venv.html).
+7. Install the requirements with `pip3 install -r requirements.txt`
 
 
 ## Usage

@@ -1,10 +1,6 @@
-# CCW API App Details
-CLIENT_KEY = ""
-CLIENT_SECRET = ""
-
 # Configurable Parameters
 KEEP_HISTORY = False
-INSERT_BEFORE_COLUMN = ""
+INSERT_BEFORE_COLUMN = ''
 
 # Excel Details
 EXCEL_FILE_NAME = ""

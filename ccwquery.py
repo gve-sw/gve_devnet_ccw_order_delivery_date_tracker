@@ -17,8 +17,11 @@ __author__ = "Trevor Maco <tmaco@cisco.com>"
 __copyright__ = "Copyright (c) 2023 Cisco and/or its affiliates."
 __license__ = "Cisco Sample Code License, Version 1.1"
 
+import os
 import sys
 from datetime import datetime, date, timezone
+
+from dotenv import load_dotenv
 from openpyxl.utils.cell import column_index_from_string
 from openpyxl import load_workbook
 
@@ -34,6 +37,11 @@ import config
 
 # Rich Console Instance
 console = Console()
+
+# Load ENV Variable
+load_dotenv()
+CLIENT_KEY = os.getenv("CLIENT_KEY")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
 
 def getAccessToken(client_id, client_secret):
@@ -205,7 +213,7 @@ def main():
     console.print(Panel.fit("GET CCW Access Token", title="Step 1"))
 
     # Get Access Token for CCW API Requests
-    access_token = getAccessToken(config.CLIENT_KEY, config.CLIENT_SECRET)
+    access_token = getAccessToken(CLIENT_KEY, CLIENT_SECRET)
     console.print("[green]Obtained Access Token for CCW API[/]")
 
     console.print(Panel.fit("Process Orders from Excel File", title="Step 2"))

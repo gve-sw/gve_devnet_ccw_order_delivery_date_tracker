@@ -4,6 +4,8 @@
 # https://towardsdatascience.com/how-to-schedule-python-scripts-with-cron-the-only-guide-youll-ever-need-deea2df63b4e
 # https://www.hostinger.com/tutorials/cron-job
 
+# If a file needs to be read of loaded into a python file, https://stackoverflow.com/questions/9318392/cant-find-file-with-python-script-when-run-via-cron
+
 # Steps:
 # 1.) Set proper permissions (for mac, skip if linux): https://dccxi.com/posts/crontab-not-working-catalina/#:~:text=Aug%206%2C%202019-,If%20Any%20of%20Your%20Crontab%20Tasks%20No%20Longer%20Works%20on,lists%20located%20at%20System%20Preferences.
 # 2.) Run `pwd` and `which python3` to get absolute paths to script files and python binary
