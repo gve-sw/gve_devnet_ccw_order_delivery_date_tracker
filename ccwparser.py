@@ -42,8 +42,8 @@ class CCWOrderParser(object):
         self.salesordernum = headerlocation['SalesOrderReference'][0]['ID']['value']
         self.shiptoparty = headerlocation['ShipToParty']['Name'][0]['value']
 
-        self.amount = headerlocation['TotalAmount']['value']
-        self.currencycode = headerlocation['TotalAmount']['currencyCode']
+        # self.amount = headerlocation['TotalAmount']['value']
+        # self.currencycode = headerlocation['TotalAmount']['currencyCode']
 
         self.linelocation = self.jsondata['ShowPurchaseOrder']['value']['DataArea']['PurchaseOrder'][0][
             'PurchaseOrderLine']
@@ -54,7 +54,7 @@ class CCWOrderParser(object):
                     "description": i['Item']['Description'][0]['value'],
                     "quantity": i['Item']['Lot'][0]['Quantity']['value'],
                     "line": i['SalesOrderReference']['LineNumberID']['value'],
-                    "amount": i['ExtendedAmount']['value'],
+                    # "amount": i['ExtendedAmount']['value'],
                     "deliveryDate": i['PromisedDeliveryDateTime'] if 'PromisedDeliveryDateTime' in i else None,
                     "shipSetNumber": i['LineIDSet'][0]['ID'][0]['value'] if 'LineIDSet' in i else None
                     }
