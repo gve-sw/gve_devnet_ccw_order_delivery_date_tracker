@@ -10,4 +10,5 @@ config.py
 .idea/
 .DS_Store
 
-*.xlsx
+src/*.xlsx
+!src/delivery_date_example.xlsx

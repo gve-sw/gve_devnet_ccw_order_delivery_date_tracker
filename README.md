@@ -1,10 +1,21 @@
 # CCW Order Tracker
 
-This script reads an Excel file containing Cisco Sales Order Numbers, and it queries Cisco Commerce Workspace to retrieve information per order. The retrieved information is written back to the Excel File. The script can be run periodically to continually update the Excel file and track updates for the desired field.
+This script reads an Excel file containing Cisco Order Numbers, and it queries Cisco Commerce Workspace to retrieve information about a SKU in the order. The retrieved information is written back to the Excel File. The script can be run periodically to continually update the Excel file and track updates for the desired Order SKU field(s).
 
-The working example is the `Promised Delivery Date` field, but the code can be easily extended to other fields. Additional example fields are present in the `CCWOrderParser` class in `ccwparser.py`
+Supported `Order Number Types` include:
+* Sales Order Number
+* Web Order Number
+* Purchase Order Number
 
-For a full list of fields, check out the `Check Order Status` CCW API example on the [Developer Portal](https://apidocs-prod.cisco.com/).
+This script can track multiple fields, as well as multiple orders (either all on one Excel sheet with an `Order Column` or multiple Excel sheets where `Sheet Name = Order Number`). A field can also be tracked over time (date stamped field entries appended to the Excel Sheet).
+
+All available fields can be found in the `CCWOrderParser` class in `ccwparser.py` as either:
+* "Order Wide" Field (class attribute self.**FIELD**) - ex: self.status, track `status` field representing status of order (booked, etc.)
+* "Line Item" Field (self.linelocation[i] dictionary key {**FIELD**: X} ) - ex: `deliveryDate` field representing the delivery date of a specific line item in the order
+
+For a full list of possible fields, check out the `Check Order Status` CCW API example on the [Developer Portal](https://apidocs-prod.cisco.com/). Additional fields would need to be added appropriately to the class.
+
+> The working example is the Promised Delivery Date for each line item in an order!
 
 ## Contacts
 * Trevor Maco
@@ -12,6 +23,7 @@ For a full list of fields, check out the `Check Order Status` CCW API example on
 ## Solution Components
 * CCW API
 * Excel
+* Pandas
 
 ## Prerequisites
 
@@ -35,59 +47,72 @@ A detailed guide is included [here](https://apiconsole.cisco.com/docs/read/overv
 
 ### Excel Input
 
-This script expects an Excel file input with a minimum of:
-* A column containing `Sales Order Numbers`
-* A column where the `Output` will be written to (if `KEEP_HISTORY` = True, this is not necessary)
+This script expects an Excel file input. At a minimum, each sheet in the Excel file should contain a column with Order `SKUs` and `Ship Set Numbers` corresponding to each SKU (prevents confusion around the same SKU in different Ship Sets).
 
-The names of the columns are specified in the `config.py` file, and other columns can be included as necessary depending on the use case.
 
-* Promised Delivery Date Use Case:
-  * Minimum Input Columns: `Sales Order`, `Delivery Date` (output -> if `KEEP_HISTORY` = True, this is not necessary)
-  * Use Case Specific Columns: `SKU`, `Ship Set Number`
+* `Orders on One Sheet`: a column containing one of the supported `Order Number` types is required. The data **MUST** be on the first sheet!
+* `Order per Sheet`: the `Sheet Name` should be the `Order Number`.
+
+The names of the columns are specified in the `config.py` file.
   
 ![](IMAGES/excel_input_example.png)
 
 
 ## Installation/Configuration
 1. Clone this repository with `git clone [repository name]`
-2. Rename the `.env_sample` file to `.env`. Rename `config_sample.py` to `config.py`.
+2. Rename the `.env_sample` file to `.env`. Rename `src/config_sample.py` to `src/config.py`.
 3. Add the App Key and App Secret to `.env` from the prerequisites section
 ```dotenv
 CLIENT_KEY=""
 CLIENT_SECRET=""
 ```
-4. Enable `KEEP_HISTORY` feature if desired (`config.py`). This feature appends new date-stamped versions of `OUTPUT_COLUMN_NAME` before the `INSERT_BEFORE_COLUMN` value (Ex: Column 'F'). Columns are shifted to the right, the previous `INSERT_BEFORE_COLUMN` value becomes the most recent entry, effectively tracking progression of a column over time from left to right.
+4. Enter the Order Number Type (`Sales Order`, `Web Order`,or `Purchase Order`) depending on which type of Order Number will be used in `src/config.py`:
 ```python
-KEEP_HISTORY = False
-INSERT_BEFORE_COLUMN = ''
+# Order Identification Section (Sales Order, Web Order, Purchase Order)
+ORDER_ID_TYPE = "Sales Order"
 ```
-
-5. Add the essential input Excel parameters in `config.py`. Add any other columns as necessary for the use case
+5. Add the essential input Excel columns and file name: 
 ```python
-EXCEL_FILE_NAME = ""
-EXCEL_SHEET_NAME = ""
-SALES_ORDER_NUMBER_COLUMN_NAME = ""
-OUTPUT_COLUMN_NAME = ""
+# Excel Details (including mandatory Ship Set Number and SKU fields)
+EXCEL_FILE_NAME = "delivery_date_example.xlsx"
+SHIP_SET_COLUMN_NAME = "Ship Set Number"
+SKU_COLUMN_NAME = "SKU"
 ```
-
-* Promised Delivery Date Use Case:
+6. If all orders are on a single sheet (sheet 1!), set the `SINGLE_SHEET` parameter to `True` (otherwise `False`) and specify the name of the column containing the `Order Numbers`:
 ```python
-# For Delivery Date Use Case
-SHIP_SET_COLUMN_NAME = ""
-SKU_COLUMN_NAME = ""
+# Process multiple orders on the same sheet, or Sheet Per Order feature (if multiple orders on a single sheet,
+# ORDER_COLUMN must exist!)
+SINGLE_SHEET = True
+ORDER_COLUMN_NAME = "Sales Order"  # Ignored if SINGLE_SHEET is False
 ```
+7. Identify which fields to track per SKU/Order. Dictionary keys **must** map to the `CCWOrderParser` class attributes or line item dictionary keys. The values are the column names in the Excel file where the data will be written (these do not have to exist!). 
+```python
+# Fields to track dictionary (mapping CCW Class fields or Line Item Fields to Excel Columns Names)
+FIELDS_TO_TRACK = {"deliveryDate": "Delivery Date"}
+```
+If no data is found for a particular field, the script will write `No Data` to the Excel file.
 
-6. Set up a Python virtual environment. Make sure Python 3 is installed in your environment, and if not, you may download Python [here](https://www.python.org/downloads/). Once Python 3 is installed in your environment, you can activate the virtual environment with the instructions found [here](https://docs.python.org/3/tutorial/venv.html).
-7. Install the requirements with `pip3 install -r requirements.txt`
+8. Enable `KEEP_HISTORY` feature if desired, and select the field to track. This feature appends new date-stamped versions of the field before the last inserted field value. Columns are shifted to the right and the new field value becomes the most recent entry, effectively tracking progression of a column over time from left to right.
+
+Note: The `KEEP_HISTORY_FIELD` must be a field that is tracked in the `FIELDS_TO_TRACK` dictionary, and it must be the last field in the `FIELDS_TO_TRACK` dictionary (otherwise formatting and inserting into the Excel file breaks!)
+```python
+# Configurable Parameters for special field tracking over time!
+KEEP_HISTORY = True
+KEEP_HISTORY_FIELD = "deliveryDate"
+```
+9. Set up a Python virtual environment. Make sure Python 3 is installed in your environment, and if not, you may download Python [here](https://www.python.org/downloads/). Once Python 3 is installed in your environment, you can activate the virtual environment with the instructions found [here](https://docs.python.org/3/tutorial/venv.html).
+10. Install the requirements with `pip3 install -r requirements.txt`
 
 
 ## Usage
 
+Change directory to `src`
+
 Run the script with `python ccwquery.py`
 
-The script will parse the input file, and using the Sales Order Number, retrieve order information from CCW.
+The script will parse the input file, and using the Order Number (either from the column or sheet name), retrieve order information from CCW.
 
-This order information is parsed using the `CCWOrderParser`, and can then be further processed for the specific use case. The results are written back to the Excel file's "output" column.
+This order information is parsed using the `CCWOrderParser`, and the results are written back to the Excel file using the `FIELDS_TO_TRACK` dictionary values for column names.
 
 * Promised Delivery Date Use Case:
 
